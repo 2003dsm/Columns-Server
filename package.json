@@ -1,0 +1,31 @@
+{
+  "name": "aa4_servidor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon Src/Index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://DanielSierraMoreno@bitbucket.org/danielsierramoreno/aa4_servidor.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://bitbucket.org/danielsierramoreno/aa4_servidor/issues"
+  },
+  "homepage": "https://bitbucket.org/danielsierramoreno/aa4_servidor#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
+    "semaphore": "^1.1.0",
+    "socket.io": "^4.5.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}

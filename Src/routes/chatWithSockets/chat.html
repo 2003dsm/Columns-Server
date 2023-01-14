@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1252">
+  <title>Socket.IO chat</title>
+  <style>
+    body {
+      margin: 0;
+      padding-bottom: 3rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    #form {
+      width: 100%;
+      height: 50%;
+      background: rgba(161, 161, 161, 0);
+      padding: 0.25rem;
+      position: fixed;
+      bottom: 25%;
+      left: 0%;
+      right: 0;
+      display: flex;
+      box-sizing: border-box;
+      backdrop-filter: blur(10px);
+    }
+    #left {
+      width: 30%;
+      height: 30%;
+      background: rgba(161, 161, 161, 0.966);
+      padding: 0.25rem;
+      position: fixed;
+      bottom: 35%;
+      left: 0%;
+      right: 0;
+      display: flex;
+      box-sizing: border-box;
+      backdrop-filter: blur(10px);
+    }
+    #right{
+      width: 30%;
+      height: 30%;
+      background: rgba(161, 161, 161, 0.966);
+      padding: 0.25rem;
+      position: fixed;
+      bottom: 35%;
+      left: 75%;
+      right: 0;
+      display: flex;
+      box-sizing: border-box;
+      backdrop-filter: blur(10px);
+    }
+    #up {
+      width: 30%;
+      height: 30%;
+      background: rgba(161, 161, 161, 0.966);
+      padding: 0.25rem;
+      position: fixed;
+      bottom: 70%;
+      left: 35%;
+      right: 0;
+      display: flex;
+      box-sizing: border-box;
+      backdrop-filter: blur(10px);
+    }
+    #down {
+      width: 30%;
+      height: 30%;
+      background: rgba(161, 161, 161, 0.966);
+      padding: 0.25rem;
+      position: fixed;
+      bottom: 0%;
+      left: 35%;
+      right: 0;
+      display: flex;
+      box-sizing: border-box;
+      backdrop-filter: blur(10px);
+    }
+    #continue{
+      width: 20%;
+      height: 20%;
+      background: rgba(161, 161, 161, 0.966);
+      padding: 0.25rem;
+      position: fixed;
+      bottom: 0%;
+      left: 0%;
+      right: 0;
+      display: flex;
+      box-sizing: border-box;
+      backdrop-filter: blur(10px);
+    }
+    #pause{
+      width: 20%;
+      height: 20%;
+      background: rgba(161, 161, 161, 0.966);
+      padding: 0.25rem;
+      position: fixed;
+      bottom: 0%;
+      left: 80%;
+      right: 0;
+      display: flex;
+      box-sizing: border-box;
+      backdrop-filter: blur(10px);
+    }
+    #input {
+      border: none;
+      padding: 0 1rem;
+      flex-grow: 1;
+      border-radius: 2rem;
+      margin: 0.25rem;
+    }
+
+    #input:focus {
+      outline: none;
+    }
+
+
+
+    #messages {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #messages>li {
+      padding: 0.5rem 1rem;
+    }
+
+    #messages>li:nth-child(odd) {
+      background: #efefef;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div id = "log" style = "text-align:center;">
+        
+          <label for="setUserName" >UserName:</label><br>
+          <input type="text" id="username" name="username"><br>
+          <label for="password">Password:</label><br>
+          <input type="password" id="password" name="password"><br>
+          <button id ="create">Create account</button>
+          <button id="sign">Sign in</button>
+  </div>
+
+  <div id = "roomsDiv">
+    <label id="currentPlayerLabel">Desconocida</label>
+      <button id = "createRoomBt">Create Room</button>
+      <ul id = "rooms"></ul>
+  </div>
+  
+  <div id ="messageDiv">
+    <label id="currentRoomLabel">Desconocida</label>
+    <button id="exitRoom">Exit room</button>
+
+      <form id="form" action=""></form>
+
+
+      <button id="left">Left</button>
+      <button id="right">Right</button>
+      <button id="up">Up</button>
+      <button id="down">Down</button>
+      <button id="continue">Continue</button>
+      <button id="pause">Pause</button>
+
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    var socket = io();
+
+    var form = document.getElementById('form');
+    var input = document.getElementById('input');
+    var userName = document.getElementById('username');
+    var password = document.getElementById('password');
+    var exit = document.getElementById('exitRoom');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (input.value) {
+        socket.emit('chat message', input.value);
+        input.value = '';
+      }
+    });
+    var currentPlayerLabel = document.getElementById("currentPlayerLabel");
+    var rotateModel = document.getElementById("up");
+    var down = document.getElementById("down");
+
+    var log = document.getElementById("log");
+    var createButton = document.getElementById("create");
+    var sign = document.getElementById("sign");
+    var moveLeft = document.getElementById("left");
+    var moveRight = document.getElementById("right");
+    var continueGame = document.getElementById("continue");
+    var pauseGame = document.getElementById("pause");
+
+
+    var roomsDiv = document.getElementById("roomsDiv");
+    var messagesDiv = document.getElementById("messageDiv");
+    var currentRoomLabel = document.getElementById("currentRoomLabel");
+    var rooms = document.getElementById("rooms");
+    var createRoomBt = document.getElementById("createRoomBt");
+
+    var interval;
+    createButton.addEventListener("click", () => {
+
+      socket.emit("createAccount",userName.value,password.value);
+      currentPlayerLabel.innerHTML = "UserName: " + playerName;
+console.log(playerName);
+
+    });
+
+    down.addEventListener("touchstart", () => {
+    interval = setInterval(function(){
+       socket.emit("pressed");
+    },100);
+
+    });
+
+    down.addEventListener("touchend", () => {
+
+    clearInterval(interval);
+    socket.emit("stopPress");
+
+    });
+
+    rotateModel.addEventListener("click", () => {
+
+    socket.emit("rotate");
+
+
+    });
+
+    moveLeft.addEventListener("click", () => {
+
+    socket.emit("moveLeft");
+
+    });
+    pauseGame.addEventListener("click", () => {
+
+socket.emit("pauseGame");
+
+});
+    moveRight.addEventListener("click", () => {
+
+    socket.emit("moveRight");
+
+    });
+    continueGame.addEventListener("click", () => {
+
+    socket.emit("continue");
+
+    });
+
+    exit.addEventListener("click", () => {
+
+socket.emit("exitRoom");
+log.hidden = true;
+
+roomsDiv.hidden = false;
+messagesDiv.hidden = true;
+});
+
+socket.on("endGame",()=>{
+  log.hidden = true;
+
+roomsDiv.hidden = false;
+messagesDiv.hidden = true;
+});
+
+    sign.addEventListener("click", () => {
+        socket.emit("sign",userName.value,password.value);
+        currentPlayerLabel.innerHTML = "UserName: " + playerName;
+console.log(playerName);
+    });
+
+    createRoomBt.addEventListener("click", () => {
+      console.log("Create new room");
+
+        socket.emit("createRoom");
+        
+    });
+
+    socket.on("setName", playerName=>{
+
+      
+    });
+
+    socket.on("connectPlay", (playerName)=>{
+
+log.hidden = true;
+
+roomsDiv.hidden = false;
+messagesDiv.hidden = true;
+});
+
+    log.hidden = false;
+
+    roomsDiv.hidden = true;
+    messagesDiv.hidden = true;
+    console.log(messagesDiv);
+    socket.on("chatRoomsList", (allRooms) =>{
+      if(allRooms)
+      {
+        console.log(allRooms);
+        rooms.innerHTML = "";
+ 
+        allRooms.forEach(room =>{
+          var item = document.createElement('li');
+          let button = document.createElement("button");
+          button.addEventListener("click", () =>{
+            socket.emit("enterToRoom", room);
+            currentRoomLabel.innerHTML = "Sala" + room;
+            messagesDiv.hidden = false;
+            roomsDiv.hidden = true;
+          })
+
+          button.innerHTML = "Room " + room;
+          item.appendChild(button);
+          rooms.appendChild(item);
+
+        });
+      }
+    })
+
+
+
+
+    socket.on('chat message', function (msg) {
+      var item = document.createElement('li');
+      item.textContent = msg;
+      messages.appendChild(item);
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+
+    socket.on('all chat message', function (allMsg) {
+
+      array.forEach(msg => {
+        var item = document.createElement('li');
+        item.textContent = msg;
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      });      
+    });
+
+  </script>
+</body>
+
+</html>
